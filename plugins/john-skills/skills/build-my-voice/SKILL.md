@@ -1,3 +1,8 @@
+---
+name: build-my-voice
+description: Analyzes samples of the user's writing and creates or updates a structured `voice-profile.yaml` describing their writing voice as weighted, evidence-backed features. Use when the user wants to capture, build, learn, profile, or update their writing voice or style from writing samples — "build my voice profile", "analyze my writing style", "learn how I write", "create a voice profile from these posts", "update my voice profile with this new sample". This skill only ANALYZES writing and produces the profile; it never drafts new content in the user's voice — use the my-voice skill for that.
+---
+
 # build-my-voice
 
 ## Purpose

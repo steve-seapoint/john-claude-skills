@@ -1,3 +1,8 @@
+---
+name: my-voice
+description: Writes or rewrites content in the user's own voice by applying an existing `voice-profile.yaml` (weights, variability, register) to the requested piece. Use when the user asks for something written or edited to sound like them — "write this in my voice", "rewrite this the way I'd say it", "make this sound like me", "use my voice profile", "draft this in my style" — including emails, posts, essays, proposals, and other prose. This skill READS the profile and never modifies it; use the build-my-voice skill to create or update the profile itself.
+---
+
 # my-voice
 
 ## Purpose
