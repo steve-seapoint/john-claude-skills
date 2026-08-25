@@ -7,6 +7,8 @@
 # Usage:
 #   deploy.sh --dir <site-dir> [--repo <name>] [--private] [--force]
 #             [--message "commit message"]
+#
+# --force publishes even if the audit or the layout check reports errors.
 
 set -euo pipefail
 
@@ -28,7 +30,7 @@ while [[ $# -gt 0 ]]; do
     --public)  VISIBILITY="--public"; shift ;;
     --message) COMMIT_MSG="${2:?--message needs a value}"; shift 2 ;;
     --force)   FORCE=1; shift ;;
-    -h|--help) sed -n '2,11p' "$0"; exit 0 ;;
+    -h|--help) sed -n "2,11p" "$0"; exit 0 ;;
     *)         die "unknown argument: $1" ;;
   esac
 done
@@ -52,6 +54,16 @@ if ! python3 "$HERE/preflight.py" .; then
   [[ "$FORCE" -eq 1 ]] ||
     die "the audit found problems that would break the published site. Fix them, or rerun with --force to publish anyway."
   say "publishing despite the audit (--force)"
+fi
+
+# Render at phone and desktop widths. Sideways overflow on a phone is a
+# blocking error; a lopsided desktop column is a note. Skips itself if no
+# renderer is available.
+say "checking the layout on phone and desktop"
+if ! python3 "$HERE/layout_check.py" .; then
+  [[ "$FORCE" -eq 1 ]] ||
+    die "the page does not lay out correctly on a phone. Fix the CSS (see the ERROR above), or rerun with --force to publish anyway."
+  say "publishing despite the layout check (--force)"
 fi
 
 # Jekyll runs by default and skips _* and .* paths, and mangles {{ }} in HTML.
