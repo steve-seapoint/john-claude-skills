@@ -25,6 +25,8 @@ If the profile does not exist, do not attempt to reconstruct the user's voice fr
 
 Ask the user to provide the file directly or via URL.
 
+The file comes in two shapes. Current profiles are a mapping with a `profile:` header and a `features:` list. Older ones are a bare list of features with no header. Read either. When there is no header, treat the corpus as undescribed rather than assuming it was broad.
+
 ## Voice Model
 
 Each feature in the profile contains:
@@ -33,6 +35,18 @@ Each feature in the profile contains:
 - `variability` — how much the feature naturally changes between writing contexts
 
 Treat these as tendencies, not binary rules.
+
+A feature may also carry `author_confirmed: true`. That feature was not inferred from writing samples — the author stated it directly. Treat it as the most reliable thing in the file.
+
+## Author Rulings
+
+The `profile:` header may carry an `author_rulings` list. Each entry records a characteristic the author was asked about and rejected: something an earlier analysis inferred from their samples and the author said was wrong.
+
+A rejected ruling is a constraint on you, not a suggestion. If a ruling says the author does use semicolons, do not avoid semicolons — and do not quietly reintroduce the rejected behavior because the profile's other features seem to lean that way.
+
+Rulings usually exist because a corpus made an absence look deliberate when it was an accident of length, format, or subject. They are the corrections the samples could never have produced.
+
+The header may also carry `open_questions` — inferences nobody has confirmed yet. Treat any feature they bear on as soft, and do not raise it above its written weight.
 
 ## Context
 
@@ -48,6 +62,8 @@ Consider:
 - expected length
 
 Do not confuse register with voice.
+
+Check the requested register against `profile.corpus`. When the request falls in `not_represented` — a long technical explanation from a profile built entirely on short public posts — the profile's high-weight, low-variability features still apply, but its contextual features have no evidence behind them for this kind of writing. Extrapolate from the stable core, hold the contextual features loosely, and invent nothing to fill the gap. It is worth telling the user, outside the artifact, that the register was not in the corpus.
 
 The same person may write differently in:
 
@@ -103,20 +119,23 @@ Features with low variability should receive little or no random modulation.
 
 Never allow randomness to overpower a high-weight, stable feature.
 
+Features carrying `author_confirmed: true` are not candidates for suppression. Vary how they surface; do not vary whether they do.
+
 The purpose of variation is to avoid making the user's voice feel formulaic.
 
 ## Writing Procedure
 
 1. Understand the requested artifact.
 2. Determine its appropriate register.
-3. Load the complete voice profile.
-4. Identify the highest-weight stable characteristics.
-5. Determine which variable characteristics fit this context.
-6. Apply modest variation to those characteristics.
-7. Write the content.
-8. Review the draft against the voice profile.
-9. Correct conspicuous deviations.
-10. Return the finished content.
+3. Load the complete voice profile, header included.
+4. Note the author rulings, and whether `corpus` covers this register.
+5. Identify the highest-weight stable characteristics and the author-confirmed ones.
+6. Determine which variable characteristics fit this context.
+7. Apply modest variation to those characteristics.
+8. Write the content.
+9. Review the draft against the voice profile and its rulings.
+10. Correct conspicuous deviations.
+11. Return the finished content.
 
 Do not expose this process unless requested.
 
@@ -126,11 +145,12 @@ When stylistic characteristics compete, prioritize:
 
 1. explicit instructions in the current request
 2. semantic accuracy
-3. high-weight, low-variability voice features
-4. contextual appropriateness
-5. high-weight, high-variability features
-6. lower-weight features
-7. stochastic variation
+3. author rulings and `author_confirmed` features
+4. high-weight, low-variability voice features
+5. contextual appropriateness
+6. high-weight, high-variability features
+7. lower-weight features
+8. stochastic variation
 
 An explicit instruction such as "make this unusually formal" overrides the normal register inferred from the profile.
 
@@ -178,5 +198,7 @@ Before returning writing, ask:
 > Would this plausibly belong in the same body of writing from which `voice-profile.yaml` was derived?
 
 If not, identify the highest-impact deviations and correct them.
+
+Then check the draft against `profile.author_rulings`. A rejected characteristic reappearing in the writing is a specific, known failure and is worth one deliberate look.
 
 Do not mention the profile, feature weights, variability, or internal voice analysis in the finished artifact unless explicitly asked.
